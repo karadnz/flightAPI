@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Microsoft.EntityFrameworkCore;
+using WebApi.Helpers;
 
 namespace flightAPI.Controllers
 {
@@ -12,25 +12,25 @@ namespace flightAPI.Controllers
     [ApiController]
     public class AirportController : ControllerBase
     {
-        List<Airport> airports = new List<Airport>
+        private readonly DataContext _context;
+
+        public AirportController(DataContext context)
         {
-            new Airport {Id = 1, Name = "Sabiha", City = "Istanbul"},
-            new Airport {Id = 2, Name = "Ataturk", City = "Istanbul"}, // Changed Id to 2
-            new Airport {Id = 3, Name = "Vecihi", City = "Zibarankoy"} // Changed Id to 3
-        };
+            _context = context;
+        }
 
         // GET: api/airport
         [HttpGet]
-        public IEnumerable<Airport> Get()
+        public async Task<IEnumerable<Airport>> Get()
         {
-            return airports;
+            return await _context.Airports.ToListAsync();
         }
 
         // GET api/airport/5
         [HttpGet("{id}")]
-        public ActionResult<Airport> Get(int id)
+        public async Task<ActionResult<Airport>> Get(int id)
         {
-            var airport = airports.FirstOrDefault(a => a.Id == id);
+            var airport = await _context.Airports.FindAsync(id);
             if (airport == null)
             {
                 return NotFound();
@@ -40,38 +40,40 @@ namespace flightAPI.Controllers
 
         // POST api/airport
         [HttpPost]
-        public ActionResult Post([FromBody] Airport newAirport)
+        public async Task<ActionResult> Post([FromBody] Airport newAirport)
         {
-            airports.Add(newAirport);
+            _context.Airports.Add(newAirport);
+            await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(Get), new { id = newAirport.Id }, newAirport);
         }
 
         // PUT api/airport/5
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] Airport updatedAirport)
+        public async Task<ActionResult> Put(int id, [FromBody] Airport updatedAirport)
         {
-            var airport = airports.FirstOrDefault(a => a.Id == id);
+            var airport = await _context.Airports.FindAsync(id);
             if (airport == null)
             {
                 return NotFound();
             }
             airport.Name = updatedAirport.Name;
             airport.City = updatedAirport.City;
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 
         // DELETE api/airport/5
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            var airport = airports.FirstOrDefault(a => a.Id == id);
+            var airport = await _context.Airports.FindAsync(id);
             if (airport == null)
             {
                 return NotFound();
             }
-            airports.Remove(airport);
+            _context.Airports.Remove(airport);
+            await _context.SaveChangesAsync();
             return NoContent();
         }
     }
-
 }
