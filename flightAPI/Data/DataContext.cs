@@ -26,4 +26,5 @@ public class DataContext : DbContext
     }
 
     public DbSet<Airport> Airports { get; set; }
+    public DbSet<AircraftModel> AircraftModels { get; set; }
 }

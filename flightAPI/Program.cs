@@ -1,4 +1,5 @@
 ﻿global using flightAPI;
+global using flightAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Helpers;
 
