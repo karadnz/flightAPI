@@ -3,6 +3,9 @@ global using flightAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Helpers;
 
+//navigation proptyleri de controllere ekle
+//orn airport id verince ordaki rotalari gorme
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

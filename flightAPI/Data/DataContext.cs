@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 
 using flightAPI;
+using Route = flightAPI.Models.Route;
 
 public class DataContext : DbContext
 {
@@ -25,6 +26,15 @@ public class DataContext : DbContext
         options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
     }
 
+    //airportta 2 tane route navigator oldugu icin
+    
+
     public DbSet<Airport> Airports { get; set; }
+    public DbSet<Route> Routes { get; set; }
+
     public DbSet<AircraftModel> AircraftModels { get; set; }
+    public DbSet<Company> Companies { get; set; }
+    public DbSet<Aircraft> Aircrafts { get; set; }
+
+    
 }

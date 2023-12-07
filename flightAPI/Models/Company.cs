@@ -3,13 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace flightAPI.Models
 {
-    public class AircraftModel
+    public class Company
     {
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]
-        public int Capacity { get; set; }
+        public int City { get; set; }
 
         // Navigation property for Aircraft
         public ICollection<Aircraft> Aircrafts { get; set; } // Represents a one-to-many relationship with Aircraft

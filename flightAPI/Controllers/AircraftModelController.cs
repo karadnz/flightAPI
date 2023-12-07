@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Helpers;
-using flightAPI.Models; // Ensure you include this to access the AircraftModel
+using flightAPI.Models;
 
 namespace flightAPI.Controllers
 {
