@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Helpers;
-using flightAPI.Models;
+using flightAPI.DTO;
 
 namespace flightAPI.Controllers
 {
@@ -22,50 +22,63 @@ namespace flightAPI.Controllers
 
         // GET: api/aircraftmodel
         [HttpGet]
-        public async Task<IEnumerable<AircraftModel>> Get()
+        public async Task<ActionResult<IEnumerable<AircraftModelDTO>>> Get()
         {
-            return await _context.AircraftModels.ToListAsync();
+            var aircraftModels = await _context.AircraftModels
+                .Select(a => new AircraftModelDTO { Id = a.Id, Name = a.Name, Capacity = a.Capacity })
+                .ToListAsync();
+            return Ok(aircraftModels);
         }
 
         // GET api/aircraftmodel/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<AircraftModel>> Get(int id)
+        public async Task<ActionResult<AircraftModelDTO>> Get(int id)
         {
             var aircraftModel = await _context.AircraftModels.FindAsync(id);
             if (aircraftModel == null)
             {
                 return NotFound();
             }
-            return aircraftModel;
+            var aircraftModelDTO = new AircraftModelDTO { Id = aircraftModel.Id, Name = aircraftModel.Name, Capacity = aircraftModel.Capacity };
+            return aircraftModelDTO;
         }
 
         // POST api/aircraftmodel
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] AircraftModel newAircraftModel)
+        public async Task<ActionResult<AircraftModelDTO>> Post([FromBody] AircraftModelDTO newAircraftModelDTO)
         {
-            _context.AircraftModels.Add(newAircraftModel);
+            var aircraftModel = new AircraftModel { Name = newAircraftModelDTO.Name, Capacity = newAircraftModelDTO.Capacity };
+            _context.AircraftModels.Add(aircraftModel);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(Get), new { id = newAircraftModel.Id }, newAircraftModel);
+
+            newAircraftModelDTO.Id = aircraftModel.Id; // Assign the generated ID back to DTO
+            return CreatedAtAction(nameof(Get), new { id = aircraftModel.Id }, newAircraftModelDTO);
         }
 
         // PUT api/aircraftmodel/5
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] AircraftModel updatedAircraftModel)
+        public async Task<IActionResult> Put(int id, [FromBody] AircraftModelDTO updatedAircraftModelDTO)
         {
+            if (id != updatedAircraftModelDTO.Id)
+            {
+                return BadRequest();
+            }
+
             var aircraftModel = await _context.AircraftModels.FindAsync(id);
             if (aircraftModel == null)
             {
                 return NotFound();
             }
-            aircraftModel.Name = updatedAircraftModel.Name;
-            aircraftModel.Capacity = updatedAircraftModel.Capacity;
+
+            aircraftModel.Name = updatedAircraftModelDTO.Name;
+            aircraftModel.Capacity = updatedAircraftModelDTO.Capacity;
             await _context.SaveChangesAsync();
             return NoContent();
         }
 
         // DELETE api/aircraftmodel/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var aircraftModel = await _context.AircraftModels.FindAsync(id);
             if (aircraftModel == null)

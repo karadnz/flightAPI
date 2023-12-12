@@ -4,7 +4,7 @@
 
 namespace flightAPI.Migrations
 {
-    public partial class Route3 : Migration
+    public partial class route : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

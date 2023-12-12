@@ -5,10 +5,38 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace flightAPI.Migrations
 {
-    public partial class aircraft2 : Migration
+    public partial class initer : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "AircraftModels",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Capacity = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AircraftModels", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Airports",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    City = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Airports", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Companies",
                 columns: table => new
@@ -16,7 +44,7 @@ namespace flightAPI.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    City = table.Column<int>(type: "integer", nullable: false)
+                    City = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,6 +92,12 @@ namespace flightAPI.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Aircrafts");
+
+            migrationBuilder.DropTable(
+                name: "Airports");
+
+            migrationBuilder.DropTable(
+                name: "AircraftModels");
 
             migrationBuilder.DropTable(
                 name: "Companies");

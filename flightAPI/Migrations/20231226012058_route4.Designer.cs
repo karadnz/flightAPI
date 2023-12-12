@@ -11,8 +11,8 @@ using WebApi.Helpers;
 namespace flightAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231225000338_Route5")]
-    partial class Route5
+    [Migration("20231226012058_route4")]
+    partial class route4
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -22,6 +22,29 @@ namespace flightAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("flightAPI.Models.Aircraft", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AircraftModelId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AircraftModelId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Aircrafts");
+                });
 
             modelBuilder.Entity("flightAPI.Models.AircraftModel", b =>
                 {
@@ -64,6 +87,27 @@ namespace flightAPI.Migrations
                     b.ToTable("Airports");
                 });
 
+            modelBuilder.Entity("flightAPI.Models.Company", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Companies");
+                });
+
             modelBuilder.Entity("flightAPI.Models.Route", b =>
                 {
                     b.Property<int>("Id")
@@ -87,6 +131,25 @@ namespace flightAPI.Migrations
                     b.ToTable("Routes");
                 });
 
+            modelBuilder.Entity("flightAPI.Models.Aircraft", b =>
+                {
+                    b.HasOne("flightAPI.Models.AircraftModel", "AircraftModel")
+                        .WithMany("Aircrafts")
+                        .HasForeignKey("AircraftModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("flightAPI.Models.Company", "Company")
+                        .WithMany("Aircrafts")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AircraftModel");
+
+                    b.Navigation("Company");
+                });
+
             modelBuilder.Entity("flightAPI.Models.Route", b =>
                 {
                     b.HasOne("flightAPI.Models.Airport", "ArrivalAirport")
@@ -104,6 +167,16 @@ namespace flightAPI.Migrations
                     b.Navigation("ArrivalAirport");
 
                     b.Navigation("DepartureAirport");
+                });
+
+            modelBuilder.Entity("flightAPI.Models.AircraftModel", b =>
+                {
+                    b.Navigation("Aircrafts");
+                });
+
+            modelBuilder.Entity("flightAPI.Models.Company", b =>
+                {
+                    b.Navigation("Aircrafts");
                 });
 #pragma warning restore 612, 618
         }

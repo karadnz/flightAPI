@@ -11,8 +11,8 @@ using WebApi.Helpers;
 namespace flightAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231225003603_aircraft2")]
-    partial class aircraft2
+    [Migration("20231226011524_route3")]
+    partial class route3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -95,8 +95,9 @@ namespace flightAPI.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("City")
-                        .HasColumnType("integer");
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()

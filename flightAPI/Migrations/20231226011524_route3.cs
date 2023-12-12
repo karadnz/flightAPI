@@ -5,7 +5,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace flightAPI.Migrations
 {
-    public partial class Route2 : Migration
+    public partial class route3 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -15,36 +15,35 @@ namespace flightAPI.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    OriginAirportId = table.Column<int>(type: "integer", nullable: false),
-                    DestinationAirportId = table.Column<int>(type: "integer", nullable: false)
+                    DepartureAirportId = table.Column<int>(type: "integer", nullable: false),
+                    ArrivalAirportId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Routes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Routes_Airports_DestinationAirportId",
-                        column: x => x.DestinationAirportId,
+                        name: "FK_Routes_Airports_ArrivalAirportId",
+                        column: x => x.ArrivalAirportId,
                         principalTable: "Airports",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Routes_Airports_OriginAirportId",
-                        column: x => x.OriginAirportId,
+                        name: "FK_Routes_Airports_DepartureAirportId",
+                        column: x => x.DepartureAirportId,
                         principalTable: "Airports",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Routes_DestinationAirportId",
+                name: "IX_Routes_ArrivalAirportId",
                 table: "Routes",
-                column: "DestinationAirportId");
+                column: "ArrivalAirportId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Routes_OriginAirportId",
+                name: "IX_Routes_DepartureAirportId",
                 table: "Routes",
-                column: "OriginAirportId");
+                column: "DepartureAirportId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

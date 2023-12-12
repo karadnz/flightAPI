@@ -9,7 +9,7 @@ namespace flightAPI.Models
         [Required]
         public string Name { get; set; }
         [Required]
-        public int City { get; set; }
+        public string City { get; set; }
 
         // Navigation property for Aircraft
         public ICollection<Aircraft> Aircrafts { get; set; } // Represents a one-to-many relationship with Aircraft

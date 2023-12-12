@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using flightAPI.Models;
+using flightAPI.DTO;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using WebApi.Helpers;
 using Route = flightAPI.Models.Route;
 
@@ -22,57 +24,63 @@ namespace flightAPI.Controllers
 
         // GET: api/route
         [HttpGet]
-        public async Task<IEnumerable<Route>> Get()
+        public async Task<ActionResult<IEnumerable<RouteDTO>>> Get()
         {
-            return await _context.Routes
-                                 .Include(r => r.DepartureAirport)
-                                 .Include(r => r.ArrivalAirport)
-                                 .ToListAsync();
+            var routes = await _context.Routes
+                .Select(r => new RouteDTO { Id = r.Id, DepartureAirport = r.DepartureAirportId, ArrivalAirport = r.ArrivalAirportId })
+                .ToListAsync();
+            return Ok(routes);
         }
 
         // GET api/route/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Route>> Get(int id)
-        {
-            var route = await _context.Routes
-                                      .Include(r => r.DepartureAirport)
-                                      .Include(r => r.ArrivalAirport)
-                                      .FirstOrDefaultAsync(r => r.Id == id);
-            if (route == null)
-            {
-                return NotFound();
-            }
-            return route;
-        }
-
-        // POST api/route
-        [HttpPost]
-        public async Task<ActionResult> Post([FromBody] Route newRoute)
-        {
-            _context.Routes.Add(newRoute);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(Get), new { id = newRoute.Id }, newRoute);
-        }
-
-        // PUT api/route/5
-        [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Route updatedRoute)
+        public async Task<ActionResult<RouteDTO>> Get(int id)
         {
             var route = await _context.Routes.FindAsync(id);
             if (route == null)
             {
                 return NotFound();
             }
+            var routeDTO = new RouteDTO { Id = route.Id, DepartureAirport = route.DepartureAirportId, ArrivalAirport = route.ArrivalAirportId };
+            return routeDTO;
+        }
 
-            route.DepartureAirportId = updatedRoute.DepartureAirportId;
-            route.ArrivalAirportId = updatedRoute.ArrivalAirportId;
+        // POST api/route
+        [HttpPost]
+        public async Task<ActionResult<RouteDTO>> Post([FromBody] RouteDTO newRouteDTO)
+        {
+            var route = new Route { DepartureAirportId = newRouteDTO.DepartureAirport, ArrivalAirportId = newRouteDTO.ArrivalAirport };
+            _context.Routes.Add(route);
+            await _context.SaveChangesAsync();
+
+            newRouteDTO.Id = route.Id; // Assign the generated ID back to DTO
+            return CreatedAtAction(nameof(Get), new { id = route.Id }, newRouteDTO);
+        }
+
+        // PUT api/route/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] RouteDTO updatedRouteDTO)
+        {
+            if (id != updatedRouteDTO.Id)
+            {
+                return BadRequest();
+            }
+
+            var route = await _context.Routes.FindAsync(id);
+            if (route == null)
+            {
+                return NotFound();
+            }
+
+            route.DepartureAirportId = updatedRouteDTO.DepartureAirport;
+            route.ArrivalAirportId = updatedRouteDTO.ArrivalAirport;
             await _context.SaveChangesAsync();
             return NoContent();
         }
 
         // DELETE api/route/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var route = await _context.Routes.FindAsync(id);
             if (route == null)

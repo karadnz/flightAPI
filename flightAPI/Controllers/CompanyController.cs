@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using WebApi.Helpers;
 using Microsoft.EntityFrameworkCore;
 
+
+
 namespace flightAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -18,50 +20,63 @@ namespace flightAPI.Controllers
 
         // GET: api/company
         [HttpGet]
-        public async Task<IEnumerable<Company>> Get()
+        public async Task<ActionResult<IEnumerable<CompanyDTO>>> Get()
         {
-            return await _context.Companies.ToListAsync();
+            var companies = await _context.Companies
+                .Select(c => new CompanyDTO { Id = c.Id, Name = c.Name, City = c.City })
+                .ToListAsync();
+            return Ok(companies);
         }
 
         // GET api/company/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Company>> Get(int id)
+        public async Task<ActionResult<CompanyDTO>> Get(int id)
         {
             var company = await _context.Companies.FindAsync(id);
             if (company == null)
             {
                 return NotFound();
             }
-            return company;
+            var companyDTO = new CompanyDTO { Id = company.Id, Name = company.Name, City = company.City };
+            return companyDTO;
         }
 
         // POST api/company
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] Company newCompany)
+        public async Task<ActionResult<CompanyDTO>> Post([FromBody] CompanyDTO newCompanyDTO)
         {
-            _context.Companies.Add(newCompany);
+            var company = new Company { Name = newCompanyDTO.Name, City = newCompanyDTO.City };
+            _context.Companies.Add(company);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(Get), new { id = newCompany.Id }, newCompany);
+
+            newCompanyDTO.Id = company.Id; // Assign the generated ID back to DTO
+            return CreatedAtAction(nameof(Get), new { id = company.Id }, newCompanyDTO);
         }
 
         // PUT api/company/5
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Company updatedCompany)
+        public async Task<IActionResult> Put(int id, [FromBody] CompanyDTO updatedCompanyDTO)
         {
+            if (id != updatedCompanyDTO.Id)
+            {
+                return BadRequest();
+            }
+
             var company = await _context.Companies.FindAsync(id);
             if (company == null)
             {
                 return NotFound();
             }
-            company.Name = updatedCompany.Name;
-            company.City = updatedCompany.City;
+
+            company.Name = updatedCompanyDTO.Name;
+            company.City = updatedCompanyDTO.City;
             await _context.SaveChangesAsync();
             return NoContent();
         }
 
         // DELETE api/company/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var company = await _context.Companies.FindAsync(id);
             if (company == null)
@@ -74,4 +89,5 @@ namespace flightAPI.Controllers
         }
     }
 }
+
 

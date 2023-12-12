@@ -27,7 +27,7 @@ public class DataContext : DbContext
     }
 
     //airportta 2 tane route navigator oldugu icin
-    
+
 
     public DbSet<Airport> Airports { get; set; }
     public DbSet<Route> Routes { get; set; }

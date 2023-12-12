@@ -5,6 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 
+
+using flightAPI.DTO;
+
+
 namespace flightAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -20,42 +24,64 @@ namespace flightAPI.Controllers
 
         // GET: api/aircraft
         [HttpGet]
-        public async Task<IEnumerable<Aircraft>> Get()
+        public async Task<ActionResult<IEnumerable<AircraftDTO>>> Get()
         {
-            return await _context.Aircrafts
-                                 .Include(a => a.AircraftModel)
-                                 .Include(a => a.Company)
-                                 .ToListAsync();
+            var aircrafts = await _context.Aircrafts
+                                          .Include(a => a.AircraftModel)
+                                          .Include(a => a.Company)
+                                          .Select(a => new AircraftDTO
+                                          {
+                                              Id = a.Id,
+                                              AircraftModelId = a.AircraftModelId,
+                                              CompanyId = a.CompanyId
+                                          })
+                                          .ToListAsync();
+            return Ok(aircrafts);
         }
 
         // GET api/aircraft/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Aircraft>> Get(int id)
+        public async Task<ActionResult<AircraftDTO>> Get(int id)
         {
             var aircraft = await _context.Aircrafts
                                          .Include(a => a.AircraftModel)
                                          .Include(a => a.Company)
-                                         .FirstOrDefaultAsync(a => a.Id == id);
+                                         .Where(a => a.Id == id)
+                                         .Select(a => new AircraftDTO
+                                         {
+                                             Id = a.Id,
+                                             AircraftModelId = a.AircraftModelId,
+                                             CompanyId = a.CompanyId
+                                         })
+                                         .FirstOrDefaultAsync();
 
             if (aircraft == null)
             {
                 return NotFound();
             }
-            return aircraft;
+            return Ok(aircraft);
         }
 
         // POST api/aircraft
         [HttpPost]
-        public async Task<ActionResult<Aircraft>> Post([FromBody] Aircraft newAircraft)
+        public async Task<ActionResult<AircraftDTO>> Post([FromBody] AircraftDTO newAircraftDto)
         {
+            var newAircraft = new Aircraft
+            {
+                AircraftModelId = newAircraftDto.AircraftModelId,
+                CompanyId = newAircraftDto.CompanyId
+            };
+
             _context.Aircrafts.Add(newAircraft);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(Get), new { id = newAircraft.Id }, newAircraft);
+
+            newAircraftDto.Id = newAircraft.Id;
+            return CreatedAtAction(nameof(Get), new { id = newAircraft.Id }, newAircraftDto);
         }
 
         // PUT api/aircraft/5
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Aircraft updatedAircraft)
+        public async Task<IActionResult> Put(int id, [FromBody] AircraftDTO updatedAircraftDto)
         {
             var aircraft = await _context.Aircrafts.FindAsync(id);
             if (aircraft == null)
@@ -63,8 +89,8 @@ namespace flightAPI.Controllers
                 return NotFound();
             }
 
-            aircraft.AircraftModelId = updatedAircraft.AircraftModelId;
-            aircraft.CompanyId = updatedAircraft.CompanyId;
+            aircraft.AircraftModelId = updatedAircraftDto.AircraftModelId;
+            aircraft.CompanyId = updatedAircraftDto.CompanyId;
 
             await _context.SaveChangesAsync();
             return NoContent();
@@ -72,7 +98,7 @@ namespace flightAPI.Controllers
 
         // DELETE api/aircraft/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var aircraft = await _context.Aircrafts.FindAsync(id);
             if (aircraft == null)
@@ -86,3 +112,4 @@ namespace flightAPI.Controllers
         }
     }
 }
+

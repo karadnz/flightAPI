@@ -11,8 +11,8 @@ using WebApi.Helpers;
 namespace flightAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231225003234_aircraft")]
-    partial class aircraft
+    [Migration("20231226010037_initer")]
+    partial class initer
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -22,6 +22,29 @@ namespace flightAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("flightAPI.Models.Aircraft", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AircraftModelId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AircraftModelId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Aircrafts");
+                });
 
             modelBuilder.Entity("flightAPI.Models.AircraftModel", b =>
                 {
@@ -64,7 +87,7 @@ namespace flightAPI.Migrations
                     b.ToTable("Airports");
                 });
 
-            modelBuilder.Entity("flightAPI.Models.Route", b =>
+            modelBuilder.Entity("flightAPI.Models.Company", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -72,38 +95,46 @@ namespace flightAPI.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ArrivalAirportId")
-                        .HasColumnType("integer");
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<int>("DepartureAirportId")
-                        .HasColumnType("integer");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ArrivalAirportId");
-
-                    b.HasIndex("DepartureAirportId");
-
-                    b.ToTable("Routes");
+                    b.ToTable("Companies");
                 });
 
-            modelBuilder.Entity("flightAPI.Models.Route", b =>
+            modelBuilder.Entity("flightAPI.Models.Aircraft", b =>
                 {
-                    b.HasOne("flightAPI.Models.Airport", "ArrivalAirport")
-                        .WithMany()
-                        .HasForeignKey("ArrivalAirportId")
+                    b.HasOne("flightAPI.Models.AircraftModel", "AircraftModel")
+                        .WithMany("Aircrafts")
+                        .HasForeignKey("AircraftModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("flightAPI.Models.Airport", "DepartureAirport")
-                        .WithMany()
-                        .HasForeignKey("DepartureAirportId")
+                    b.HasOne("flightAPI.Models.Company", "Company")
+                        .WithMany("Aircrafts")
+                        .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ArrivalAirport");
+                    b.Navigation("AircraftModel");
 
-                    b.Navigation("DepartureAirport");
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("flightAPI.Models.AircraftModel", b =>
+                {
+                    b.Navigation("Aircrafts");
+                });
+
+            modelBuilder.Entity("flightAPI.Models.Company", b =>
+                {
+                    b.Navigation("Aircrafts");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace flightAPI.Models
 {
@@ -12,14 +10,13 @@ namespace flightAPI.Models
         [Required]
         public int DepartureAirportId { get; set; }
 
-        [JsonIgnore]
+        [ForeignKey("DepartureAirportId")]
         public Airport DepartureAirport { get; set; }
 
         [Required]
         public int ArrivalAirportId { get; set; }
 
-        [JsonIgnore]
+        [ForeignKey("ArrivalAirportId")]
         public Airport ArrivalAirport { get; set; }
     }
 }
-
